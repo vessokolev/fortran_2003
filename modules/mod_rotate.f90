@@ -4,7 +4,7 @@ module mod_rotate
 ! around selected axis and computes the proper dihedral angles.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019020500
+! Version: 2019020600
 ! License: GPLv2
 !
 
@@ -61,8 +61,9 @@ do i=1,ubound(branches_i,2)
    !
    do j=branches_i(1,i),branches_i(2,i)
       !
-      ! Use the square of the cutoff. That save CPU time due to not
-      ! calling the 'sqrt' intrinsic function.
+      ! Use the square of the cutoff. That saves CPU time for not
+      ! calling the 'sqrt' intrinsic function (that function is
+      ! not fast enough).
       !
       if (sum((coord(:,branches(j))-center)**2)<cutoff_) then
          !
