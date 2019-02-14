@@ -68,12 +68,12 @@ subroutine rotate_around_axis(vect,rodrigues_matrix)
 !
 ! Rotates 3D vector around 3D axis.
 !
-! NOTES: "vect" is the vector to rotate. The elements of the matrix
-!        named "rodrigues_matrix" can be computed by calling the
-!        subroutine "get_rodrigues_matrix".
-!
-!        IT IS IMPORTANT to note that the vector 'vect' MUST
-!        begin at [0,0,0]. If not - do shift it.
+! NOTES: "vect" defines the 3D equation of the axis line. It MUST have
+!        the initial point (origin) of one of the vectors defining the
+!        axis line (shift the vector 'vect' with respect to that
+!        vector). The elements of the matrix named "rodrigues_matrix"
+!        can be computed by calling the subroutine
+!        "get_rodrigues_matrix".
 !
 !        Details regarding the construction and implementation of the
 !        Rodrigues' formula, can be found at:
@@ -107,16 +107,19 @@ end subroutine rotate_around_axis
 
 subroutine get_rodrigues_matrix(vect,angle,matrix)
 !
-! Calculates the rotation matrix elements that allow the
-! application of the Rodrigues' formula. For more details see:
+! Calculates the rotation matrix elements that allow the application of
+! the Rodrigues' formula. For more details see:
 !
 ! https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
 !
-! NOTES: "vect" defines the 3D equation of the axis line.
-!        It MUST begin at (0,0,0). Supply the angle "angle"
-!        in radians!
+! NOTES: "vect" defines the 3D equation of the axis line. It MUST have
+!        the initial point (origin) of one of the vectors defining the
+!        axis line (shift the vector 'vect' with respect to that
+!        vector).
 !
-!        The matrix indexing foolows the Fortran way, not the
+!        Supply the angle "angle" in radians!
+!
+!        The matrix indexing follows the Fortran way, not the
 !        one of C. Do take this into account when reading the code. The
 !        matrix 'rodrigues_matrix' used bellow is the transpose of the
 !        one given in the books.
@@ -165,11 +168,10 @@ end subroutine get_rodrigues_matrix
 
 subroutine angle_between_vectors(v1,v2,angle,vprod)
 !
-! Computes the angle between two vectors in 3D.
-! It returns the angle in radians (as 'angle') and
-! the vector product (as 'vprod')
+! Computes the angle between two vectors in 3D. It returns the angle
+! in radians (as 'angle') and the vector product (as 'vprod').
 !
-! IMPORTANT: The vectors MUST begin at (0,0,0)!
+! IMPORTANT: The vectors MUST share the same initial point (origin)!
 !
 ! Interface variables:
 !
@@ -208,8 +210,8 @@ end subroutine vector_cross_product
 
 function norm02(argument) result(res)
 !
-! This function computes the norm of the N-dimensional
-! vector of floating point numbers.
+! This function computes the norm of the N-dimensional vector of
+! floating point numbers.
 !
 ! Interface variables:
 !
@@ -277,6 +279,39 @@ do j=1,3
 end do
 
 end subroutine compute_rot_m
+
+
+subroutine get_equation_of_plane(v1,v2,v3,equ)
+!
+! Computes the equation of a 3D plane in the form:
+!
+! f(x,y,z) = equ(1)*x + equ(2)*y + equ(3)*z + equ(4) = 0
+!
+! The parameters are the elements of the array "equ" and x, y, z are the
+! components of a vector that belongs to the plane. Three vectors are
+! required to compute the parameters 'equ(1:4).' The vector normal to
+! the plane, n, can be obtained by nomalizing the vector 'equ(1:3)':
+!
+! n = equ(1:3)/norm02(equ(1:3))
+!
+! NOTE: The subroutine 'vector_cross_product' requires the input vectors
+!       'v1' and 'v3' to share the same initial point. One way to do so
+!       it to shift 'v1' and 'v3' by 'v2' (see the code bellow). 
+!
+! Interface variables:
+!
+real(C_FLOAT),intent(in)  :: v1(3)
+real(C_FLOAT),intent(in)  :: v2(3)
+real(C_FLOAT),intent(in)  :: v3(3)
+real(C_FLOAT),intent(out) :: equ(4)
+
+call vector_cross_product(v1-v2,v3-v2,equ(1:3))
+!
+equ(4)=v1(1)*equ(1)+v1(2)*equ(2)+v1(3)*equ(3)
+!
+equ(4)=-equ(4)
+
+end subroutine get_equation_of_plane
 
 
 end module mod_rotate
