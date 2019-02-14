@@ -3,7 +3,7 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021400
+! Version: 2019021401
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
@@ -80,7 +80,7 @@ subroutine rotate_around_axis(vect,rodrigues_matrix)
 !
 !        https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
 !
-!        The matrix indexing foolows the Fortran way, not the
+!        The matrix indexing follows the Fortran way, not the
 !        one of C. Do take this into account when reading the code. The
 !        matrix 'rodrigues_matrix' used bellow is the transpose of the
 !        one given in the books.
