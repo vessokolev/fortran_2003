@@ -14,7 +14,7 @@ implicit none
 contains
 
 
-subroutine rotate_branch_around_axis(axis,branch,angle,coord)
+subroutine rotate_branch_about_axis(axis,branch,angle,coord)
 !
 ! Rotates a set of points (branch) about an arbitrary axis in 3D.
 !
@@ -61,12 +61,12 @@ do i=1,ubound(branch,1)
    !
 end do
 
-end subroutine rotate_branch_around_axis
+end subroutine rotate_branch_about_axis
 
 
-subroutine rotate_around_axis(vect,rodrigues_matrix)
+subroutine rotate_about_axis(vect,rodrigues_matrix)
 !
-! Rotates 3D vector around 3D axis.
+! Rotates 3D vector about an arbitraty 3D axis.
 !
 ! NOTES: "vect" defines the 3D equation of the axis line. It MUST have
 !        the initial point (origin) of one of the vectors defining the
@@ -102,7 +102,7 @@ integer(C_INT)              :: i
 !
 forall (i=1:3) vect(i)=sum(rodrigues_matrix(:,i)*vect(:))
 
-end subroutine rotate_around_axis
+end subroutine rotate_about_axis
 
 
 subroutine get_rodrigues_matrix(vect,angle,matrix)
