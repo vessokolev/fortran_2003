@@ -98,7 +98,7 @@ integer(C_INT)              :: i
 ! for keeping the initial components of 'vect'. Hence, instead of
 ! explicitly declaring an internal (to the subroutine) storage variable,
 ! which is a must, when having a 'do'-loop constructor, one could simply
-! employ 'forall' instead of a 'do'-loop constructor.
+! employ 'forall' instead.
 !
 forall (i=1:3) vect(i)=sum(rodrigues_matrix(:,i)*vect(:))
 
