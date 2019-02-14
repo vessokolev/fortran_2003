@@ -3,7 +3,7 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021300
+! Version: 2019021400
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
@@ -72,6 +72,19 @@ subroutine rotate_around_axis(vect,rodrigues_matrix)
 !        named "rodrigues_matrix" can be computed by calling the
 !        subroutine "get_rodrigues_matrix".
 !
+!        IT IS IMPORTANT to note that the vector 'vect' MUST
+!        begin at [0,0,0]. If not - do shift it.
+!
+!        Details regarding the construction and implementation of the
+!        Rodrigues' formula, can be found at:
+!
+!        https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+!
+!        The matrix indexing foolows the Fortran way, not the
+!        one of C. Do take this into account when reading the code. The
+!        matrix 'rodrigues_matrix' used bellow is the transpose of the
+!        one given in the books.
+!
 ! Interface variables:
 !
 real(C_FLOAT),intent(inout) :: vect(3)
@@ -81,6 +94,12 @@ real(C_FLOAT),intent(in)    :: rodrigues_matrix(3,3)
 !
 integer(C_INT)              :: i
 
+! Using 'forall' implicitly declares intermediate storage slot for
+! storing there the initial components of 'vect'. Hence, instead of
+! explicitly declaring an internal (to the subroutine) storage variable,
+! which in turn requires a 'do'-loop, one could simply employ 'forall'
+! and make the code shorter.
+!
 forall (i=1:3) vect(i)=sum(rodrigues_matrix(:,i)*vect(:))
 
 end subroutine rotate_around_axis
@@ -97,10 +116,10 @@ subroutine get_rodrigues_matrix(vect,angle,matrix)
 !        It MUST begin at (0,0,0). Supply the angle "angle"
 !        in radians!
 !
-! IMPORTANT!!!
-!
-! The matrix indexing foolows the Fortran way, not the
-! one of C. Do take this into account!
+!        The matrix indexing foolows the Fortran way, not the
+!        one of C. Do take this into account when reading the code. The
+!        matrix 'rodrigues_matrix' used bellow is the transpose of the
+!        one given in the books.
 !
 ! Interface variables:
 !
@@ -207,9 +226,9 @@ subroutine compute_rot_m(axis_num,angle,matrix)
 ! Computes the components of the matrix supporting the rotation
 ! of a vector about the axis x, y, or z:
 !
-! axis_num=1 -> x
-! axis_num=2 -> y
-! axis_num=3 -> z
+! axis_num=1 -> x (the unit vector is [1,0,0])
+! axis_num=2 -> y (the unit vector is [0,1,0])
+! axis_num=3 -> z (the unit vector is [0,0,1])
 !
 ! by angle 'angle' (given in radians).
 !
@@ -245,7 +264,7 @@ arr(4)=sin(angle)
 arr(5)=-arr(4)
 !
 ! Note, that the second index of 'matrix' specifies the row number
-! of the rotation matrix (see the NOTE remarks given above):
+! of the rotation matrix (see the NOTE above):
 !
 do j=1,3
    !
