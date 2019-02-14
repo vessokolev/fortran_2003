@@ -94,11 +94,11 @@ real(C_FLOAT),intent(in)    :: rodrigues_matrix(3,3)
 !
 integer(C_INT)              :: i
 
-! Using 'forall' implicitly declares intermediate storage slot for
-! storing there the initial components of 'vect'. Hence, instead of
+! The use of 'forall' implicitly declares an intermediate storage slot
+! for keeping the initial components of 'vect'. Hence, instead of
 ! explicitly declaring an internal (to the subroutine) storage variable,
-! which in turn requires a 'do'-loop, one could simply employ 'forall'
-! and make the code shorter.
+! which is a must, when having a 'do'-loop constructor, one could simply
+! employ 'forall' instead of a 'do'-loop constructor.
 !
 forall (i=1:3) vect(i)=sum(rodrigues_matrix(:,i)*vect(:))
 
