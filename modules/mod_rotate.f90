@@ -3,7 +3,7 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021401
+! Version: 2019021402
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
@@ -199,7 +199,6 @@ real(C_FLOAT),intent(out) :: prod(3)
 !
 ! Local variables:
 !
-integer(C_INT)            :: i
 integer(C_INT),parameter  :: factor1(3)=(/2,3,1/)
 integer(C_INT),parameter  :: factor2(3)=(/3,1,2/)
 
@@ -250,11 +249,14 @@ real(C_FLOAT),intent(out) :: matrix(3,3)
 integer(C_INT)            :: i
 integer(C_INT)            :: j
 real(C_FLOAT)             :: arr(5)
-integer(C_INT),parameter  :: factor(3,3,3)=[&
-                                  reshape([2,1,1,1,3,5,1,4,3],[3,3]),&
-                                  reshape([3,1,4,1,2,1,5,1,3],[3,3]),&
-                                  reshape([3,5,1,4,3,1,1,1,2],[3,3])]
+integer(C_INT),parameter  :: limits(2,3)=reshape([1,3,4,6,7,9],[2,3])
+integer(C_INT),parameter  :: tmp(3,9)=reshape([2,1,1,1,3,5,1,4,3,&
+                                               3,1,4,1,2,1,5,1,3,&
+                                               3,5,1,4,3,1,1,1,2],[3,9])
+integer(C_INT)            :: selection(3,3)
 
+selection(:,:)=tmp(:,limits(1,axis_num):limits(2,axis_num))
+!
 arr(1)=0.0
 arr(2)=1.0
 !
@@ -272,7 +274,7 @@ do j=1,3
    !
    do i=1,3
       !
-      matrix(i,j)=arr(factor(i,j,axis_num))
+      matrix(i,j)=arr(selection(i,j))
       !
    end do
    !
