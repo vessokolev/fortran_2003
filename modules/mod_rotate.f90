@@ -3,7 +3,7 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021402
+! Version: 2019021404
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
@@ -55,7 +55,7 @@ do i=1,ubound(branch,1)
    !
    coord(:,branch(i))=coord(:,branch(i))-coord(:,axis(1))
    !
-   call rotate_around_axis(coord(:,branch(i)),matrix)
+   call rotate_about_axis(coord(:,branch(i)),matrix)
    !
    coord(:,branch(i))=coord(:,branch(i))+coord(:,axis(1))
    !
@@ -249,13 +249,13 @@ real(C_FLOAT),intent(out) :: matrix(3,3)
 integer(C_INT)            :: i
 integer(C_INT)            :: j
 real(C_FLOAT)             :: arr(5)
+integer(C_INT)            :: selection(3,3)
 integer(C_INT),parameter  :: limits(2,3)=reshape([1,3,4,6,7,9],[2,3])
-integer(C_INT),parameter  :: tmp(3,9)=reshape([2,1,1,1,3,5,1,4,3,&
+integer(C_INT),parameter  :: ind(3,9)=reshape([2,1,1,1,3,5,1,4,3,&
                                                3,1,4,1,2,1,5,1,3,&
                                                3,5,1,4,3,1,1,1,2],[3,9])
-integer(C_INT)            :: selection(3,3)
 
-selection(:,:)=tmp(:,limits(1,axis_num):limits(2,axis_num))
+selection(:,:)=ind(:,limits(1,axis_num):limits(2,axis_num))
 !
 arr(1)=0.0
 arr(2)=1.0
