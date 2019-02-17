@@ -316,4 +316,102 @@ equ(4)=-equ(4)
 end subroutine get_equation_of_plane
 
 
+subroutine calc_prop_dih_angle(coord,i,j,k,l,angle,flag)
+!
+! Computes the proper dihedral angle by employing the intrinsic function
+! 'atan2'. The result is supplied in radians. The optional variable
+! 'flag', if presented and set '.true.' keeps the result in [0,2*pi).
+!
+! Interface variables:
+!
+real(C_FLOAT),intent(in)    :: coord(:,:)
+integer(C_INT),intent(in)   :: i
+integer(C_INT),intent(in)   :: j
+integer(C_INT),intent(in)   :: k
+integer(C_INT),intent(in)   :: l
+real(C_FLOAT),intent(out)   :: angle
+logical,optional,intent(in) :: flag 
+!
+! Local variables:
+!
+real(C_FLOAT)               :: b1(3)
+real(C_FLOAT)               :: b2(3)
+real(C_FLOAT)               :: b3(3)
+real(C_FLOAT)               :: n1(3)
+real(C_FLOAT)               :: n2(3)
+!
+! 'pix2' stands for '2* pi':
+!
+real(C_FLOAT),parameter   :: pix2=8*atan(1.0)
+
+b1=coord(:,i)-coord(:,j)
+!
+b2=coord(:,j)-coord(:,k)
+!
+b3=coord(:,k)-coord(:,l)
+!
+! Compute 'n1 =  b1 x b2':
+!
+call vector_cross_product(b1,b2,n1)
+!
+! Normalize n1. Use 'angle' as dummy variable:
+!
+angle=norm02(n1)
+!
+n1=n1/angle
+!
+! Note that after 'n1' is computed there is no need to keep 'b1'
+! anymore. That means 'b1' might be used as a dummy variable to help
+! reducing the number of declared variables.
+!
+! Compute 'n2 =  b2 x b3':
+!
+call vector_cross_product(b2,b3,n2)
+!
+! Normalize 'n2'. Use 'angle' as dummy variable:
+!
+angle=norm02(n2)
+!
+n2=n2/angle
+!
+! Normalize 'b2'. Use 'angle' as dummy variable:
+!
+angle=norm02(b2)
+!
+b2=b2/angle
+!
+! Bellow this line 'b1' is used as a dummy vector variable. So it
+! can be used as 'm1' in the product:
+!
+! m1 = n1 x b2
+!
+call vector_cross_product(n1,b2,b1)
+!
+! Compute the dihedral angle using the intrinsic function 'atan2':
+!
+angle=atan2(dot_product(b1,n2),dot_product(n1,n2))
+!
+! If 'flag=.true.' than the values of the angle are always kept
+! positive. That means if 'alpha < 0' then the following re-computation
+! will be performed:
+!
+! alpha=alpha+2*pi
+!
+if (present(flag)) then
+   !
+   if (flag) then
+      !
+      if (angle<0.0) then
+         !
+         angle=angle+pix2
+         !
+      end if
+      !
+   end if
+   !
+end if
+
+end subroutine calc_prop_dih_angle
+
+
 end module mod_rotate
