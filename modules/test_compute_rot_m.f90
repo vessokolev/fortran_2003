@@ -8,11 +8,11 @@ program test_compute_rot_m
 ! z -> [0,0,1]
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021400
+! Version: 2019021600
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
-use mod_rotate
+use mod_rotate,only:compute_rot_m
 !
 implicit none
 !
