@@ -16,7 +16,7 @@ program test_vector_rotation_about_axis
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
-use mod_rotate
+use mod_rotate,only:get_rodrigues_matrix,rotate_about_axis
 
 integer(C_INT)              :: i
 integer(C_INT)              :: j
