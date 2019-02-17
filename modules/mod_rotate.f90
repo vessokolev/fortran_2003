@@ -3,12 +3,17 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021600
+! Version: 2019021601
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
 
 implicit none
+
+real(C_FLOAT),parameter   :: pi=4.0*atan(1.0)
+real(C_FLOAT),parameter   :: pix2=2*pi
+real(C_FLOAT),parameter   :: rad2deg=180/pi
+real(C_FLOAT),parameter   :: deg2rad=1/rad2deg
 
 
 contains
@@ -342,7 +347,7 @@ real(C_FLOAT)               :: n2(3)
 !
 ! 'pix2' stands for '2* pi':
 !
-real(C_FLOAT),parameter   :: pix2=8*atan(1.0)
+!real(C_FLOAT),parameter   :: pix2=8*atan(1.0)
 
 b1=coord(:,i)-coord(:,j)
 !
@@ -412,6 +417,72 @@ if (present(flag)) then
 end if
 
 end subroutine calc_prop_dih_angle
+
+
+subroutine calc_improp_dih_angle(coord,i,j,k,l,angle,flag)
+!
+! Computes the improper dihedral angle, as the angle between the vectors
+! normal to the planes (i,j,k) and (j,k,l).
+!
+! Preview of the construction of the improper dihedral angle:
+!
+!    l
+!    |
+!    i
+!  /   \
+!  j   k
+!
+! Interface variables:
+!
+real(C_FLOAT),intent(in)    :: coord(:,:)
+integer(C_INT),intent(in)   :: i
+integer(C_INT),intent(in)   :: j
+integer(C_INT),intent(in)   :: k
+integer(C_INT),intent(in)   :: l
+real(C_FLOAT),intent(out)   :: angle
+logical,optional,intent(in) :: flag
+!
+! Local variables:
+!
+real(C_FLOAT)               :: n1(3)
+real(C_FLOAT)               :: n2(3)
+real(C_FLOAT)               :: n3(3)
+
+! Compute the vector normal to the plane (i,j,k):
+!
+call vector_cross_product(coord(:,i)-coord(:,j),&
+                          coord(:,k)-coord(:,j),n1)
+!
+! Compute the vector normal to the plane (i,j,k):
+!
+call vector_cross_product(coord(:,l)-coord(:,j),&
+                          coord(:,k)-coord(:,j),n2)
+!
+! Calculate the angle between the normal vectors:
+!
+call angle_between_vectors(n1,n2,angle,n3)
+!
+! If 'flag=.true.' than the values of the angle are always kept
+! positive. That means if 'alpha < 0' then the following re-computation
+! will be performed:
+!
+! alpha=alpha+2*pi
+!
+if (present(flag)) then
+   !
+   if (flag) then
+      !
+      if (angle<0.0) then
+         !
+         angle=angle+pix2
+         !
+      end if
+      !
+   end if
+   !
+end if
+
+end subroutine calc_improp_dih_angle
 
 
 end module mod_rotate
