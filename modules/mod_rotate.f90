@@ -3,7 +3,7 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021404
+! Version: 2019021600
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
