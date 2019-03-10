@@ -3,7 +3,7 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019030900
+! Version: 2019030901
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
@@ -177,8 +177,7 @@ do i=1,6
       !
    end if
    !
-   matrix(factor_2(1,i),factor_2(2,i))=n(factor_3(1,i))*omcos_+&
-                                       tmp*sin_
+   matrix(factor_2(1,i),factor_2(2,i))=n(factor_3(1,i))*omcos_+tmp*sin_
    !
 end do
 
@@ -187,8 +186,8 @@ end subroutine get_rodrigues_matrix
 
 subroutine angle_between_vectors(v1,v2,angle,vprod)
 !
-! Computes the angle between two vectors in 3D. It returns the angle
-! in radians (as 'angle') and the vector product (as 'vprod').
+! Computes the angle between two vectors in 3D. Returns the angle in
+! radians (as 'angle') and the vector product (as 'vprod').
 !
 ! IMPORTANT: The vectors MUST share the same initial point (origin)!
 !
@@ -279,7 +278,7 @@ selection(:,:)=ind(:,limits(1,axis_num):limits(2,axis_num))
 arr(1)=0.0
 arr(2)=1.0
 !
-! Compute the sin and cos in advance and save the results as
+! Computes the sin and cos in advance and save the results as
 ! local variables (reduces the CPU cost).
 !
 arr(3)=cos(angle)
