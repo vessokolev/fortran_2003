@@ -3,11 +3,11 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021601
+! Version: 2019030900
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
-
+!
 implicit none
 
 real(C_FLOAT),parameter   :: pi=4.0*atan(1.0)
@@ -139,15 +139,18 @@ real(C_FLOAT),intent(out) :: matrix(3,3)
 !
 integer(C_INT)            :: i
 integer(C_INT),parameter  :: factor_1(2,3)=reshape([1,2,1,3,2,3],[2,3])
-integer(C_INT),parameter  :: factor_2(2,3)=reshape([2,1,3,2,1,3],[2,3])
-integer(C_INT),parameter  :: factor_3(2,3)=reshape([1,3,3,1,2,2],[2,3])
-integer(C_INT),parameter  :: factor_4(2,3)=reshape([3,1,1,2,2,3],[2,3])
-integer(C_INT),parameter  :: factor_5(2,3)=reshape([2,2,1,3,3,1],[2,3])
+integer(C_INT),parameter  :: factor_2(2,6)=reshape([2,1,3,2,1,3,3,1,1,&
+                                                    2,2,3],[2,6])
+integer(C_INT),parameter  :: factor_3(2,6)=reshape([1,3,3,1,2,2,2,2,1,&
+                                                    3,3,1],[2,6])
+integer(C_INT),parameter  :: factor_4(6)=[.true.,.true.,.true.,&
+                                          .false.,.false.,.false.]
 real(C_FLOAT)             :: norm(3)
 real(C_FLOAT)             :: cos_
 real(C_FLOAT)             :: sin_
 real(C_FLOAT)             :: omcos_
 real(C_FLOAT)             :: n(3)
+real(C_FLOAT)             :: tmp
 
 norm=vect/norm02(vect)
 !
@@ -156,17 +159,28 @@ sin_=sin(angle)
 !
 omcos_=1-cos_
 !
-forall (i=1:3) n(i)=norm(factor_1(1,i))*norm(factor_1(2,i))
+! Implicit loop bellow:
 !
-forall (i=1:3) matrix(i,i)=cos_+omcos_*norm(i)**2
+n=norm(factor_1(1,:))*norm(factor_1(2,:))
 !
-forall (i=1:3) matrix(factor_2(1,i),factor_2(2,i))=&
-                  n(factor_3(1,i))*omcos_-&
-                  norm(factor_3(2,i))*sin_
-!
-forall (i=1:3) matrix(factor_4(1,i),factor_4(2,i))=&
-                  n(factor_5(1,i))*omcos_+&
-                  norm(factor_5(2,i))*sin_
+do i=1,6
+   !
+   if (factor_4(i)) then
+      !
+      tmp=-norm(factor_3(2,i))
+      !
+      matrix(i,i)=cos_+omcos_*norm(i)**2
+      !
+   else
+      !
+      tmp=norm(factor_3(2,i))
+      !
+   end if
+   !
+   matrix(factor_2(1,i),factor_2(2,i))=n(factor_3(1,i))*omcos_+&
+                                       tmp*sin_
+   !
+end do
 
 end subroutine get_rodrigues_matrix
 

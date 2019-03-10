@@ -9,10 +9,10 @@ program test_vector_rotation_about_axis
 ! rotated by means of the subroutines. To preview the result, invoke
 ! VMD as:
 !
-! vmd 00*.pdb
+! vmd *.pdb
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019021600
+! Version: 2019030900
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
@@ -77,7 +77,7 @@ center=center/num_atoms
 !
 ! Write down a PDB with the initial atom coordinates:
 !
-write(file_name,fmt='(I5.5,A4)') 0,'.pdb'
+write(file_name,fmt='(I3.3,A4)') 0,'.pdb'
 !
 call write_pdb(file_name,line,coord)
 !
@@ -86,7 +86,7 @@ call write_pdb(file_name,line,coord)
 !
 do i=1,100
    !
-   write(file_name,fmt='(I5.5,A4)') i,'.pdb'
+   write(file_name,fmt='(I3.3,A4)') i,'.pdb'
    !
    call random_number(axis)
    !
