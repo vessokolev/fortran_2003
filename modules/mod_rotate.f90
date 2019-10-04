@@ -3,8 +3,17 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019100400
+! Version: 2019100401
 ! License: GPLv2
+!
+! NOTE: The coordinate set 'coord', employed in the subroutines bellow,
+!       implies the following rule of indexing:
+!
+!       coord(i,j)
+!
+!       were 'i' is the axis of projection (x (i=1), y (i=2), and
+!       z (i=3), and 'j' is the index (number, position) of the
+!       coordinate in the set.
 !
 use iso_c_binding,only:C_INT,C_FLOAT
 !
@@ -338,7 +347,14 @@ subroutine calc_prop_dih_angle(coord,i,j,k,l,angle,flag)
 !
 ! Computes the proper dihedral angle by employing the intrinsic function
 ! 'atan2'. The result is supplied in radians. The optional variable
-! 'flag', if presented and set '.true.' keeps the result in [0,2*pi).
+! 'flag', if presented and set '.true.' keeps the angle witin [0,2*pi).
+!
+! Preview of the construction of the improper dihedral angle:
+!
+!             l
+!     j - k /
+!   /
+! i 
 !
 ! Interface variables:
 !
@@ -372,11 +388,9 @@ b3=coord(:,k)-coord(:,l)
 !
 call vector_cross_product(b1,b2,n1)
 !
-! Normalize n1. Use 'angle' as dummy variable:
+! Normalize 'n1':
 !
-angle=norm02(n1)
-!
-n1=n1/angle
+n1=n1/norm02(n1)
 !
 ! Note that after 'n1' is computed there is no need to keep 'b1'
 ! anymore. That means 'b1' might be used as a dummy variable to help
@@ -386,17 +400,13 @@ n1=n1/angle
 !
 call vector_cross_product(b2,b3,n2)
 !
-! Normalize 'n2'. Use 'angle' as dummy variable:
+! Normalize 'n2':
 !
-angle=norm02(n2)
+n2=n2/norm02(n2)
 !
-n2=n2/angle
+! Normalize 'b2':
 !
-! Normalize 'b2'. Use 'angle' as dummy variable:
-!
-angle=norm02(b2)
-!
-b2=b2/angle
+b2=b2/norm02(b2)
 !
 ! Bellow this line 'b1' is used as a dummy vector variable. So it
 ! can be used as 'm1' in the product:
@@ -409,21 +419,16 @@ call vector_cross_product(n1,b2,b1)
 !
 angle=atan2(dot_product(b1,n2),dot_product(n1,n2))
 !
-! If 'flag=.true.' than the values of the angle are always kept
-! positive. That means if 'alpha < 0' then the following re-computation
-! will be performed:
+! If 'flag=.true.', the value of the angle will be kept positive,
+! by means of the following tranformation:
 !
 ! alpha=alpha+2*pi
 !
 if (present(flag)) then
    !
-   if (flag) then
+   if (flag.and.angle<0.0) then
       !
-      if (angle<0.0) then
-         !
-         angle=angle+pix2
-         !
-      end if
+      angle=angle+pix2
       !
    end if
    !
@@ -434,8 +439,10 @@ end subroutine calc_prop_dih_angle
 
 subroutine calc_improp_dih_angle(coord,i,j,k,l,angle,flag)
 !
-! Computes the improper dihedral angle, as the angle between the vectors
-! normal to the planes (i,j,k) and (j,k,l).
+! Computes the imprproper dihedral angle, as the angle defined between
+! the vectors normal to the planes (i,j,k) and (j,k,l). The result is
+! supplied in radians. The optional variable 'flag', if presented and
+! set '.true.' keeps the angle witin [0,2*pi).
 !
 ! Preview of the construction of the improper dihedral angle:
 !
@@ -475,21 +482,16 @@ call vector_cross_product(coord(:,l)-coord(:,j),&
 !
 call angle_between_vectors(n1,n2,angle,n3)
 !
-! If 'flag=.true.' than the values of the angle are always kept
-! positive. That means if 'alpha < 0' then the following re-computation
-! will be performed:
+! If 'flag=.true.', the value of the angle will be kept positive,
+! by means of the following tranformation:
 !
 ! alpha=alpha+2*pi
 !
 if (present(flag)) then
    !
-   if (flag) then
+   if (flag.and.angle<0.0) then
       !
-      if (angle<0.0) then
-         !
-         angle=angle+pix2
-         !
-      end if
+      angle=angle+pix2
       !
    end if
    !
