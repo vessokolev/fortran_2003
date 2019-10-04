@@ -3,7 +3,7 @@ module mod_rotate
 ! Module supporting the rotation of vectors in 3D.
 !
 ! Author : Veselin Kolev <vesso.kolev@gmail.com>
-! Version: 2019030901
+! Version: 2019100400
 ! License: GPLv2
 !
 use iso_c_binding,only:C_INT,C_FLOAT
@@ -143,7 +143,7 @@ integer(C_INT),parameter  :: factor_2(2,6)=reshape([2,1,3,2,1,3,3,1,1,&
                                                     2,2,3],[2,6])
 integer(C_INT),parameter  :: factor_3(2,6)=reshape([1,3,3,1,2,2,2,2,1,&
                                                     3,3,1],[2,6])
-integer(C_INT),parameter  :: factor_4(6)=[.true.,.true.,.true.,&
+logical,parameter         :: factor_4(6)=[.true.,.true.,.true.,&
                                           .false.,.false.,.false.]
 real(C_FLOAT)             :: norm(3)
 real(C_FLOAT)             :: cos_
